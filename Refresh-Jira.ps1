@@ -13,7 +13,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath \credentials\Credentials
 #configure the database targets and refresh type
 $paramSplat = @{
     SqlInstance = "localhost"
-    SqlDatabase = "Jira_Experiment"
+    SqlDatabase = "Jira"
     RefreshType = (Get-JiraRefreshTypes).Differential
 }
 
@@ -33,7 +33,7 @@ Open-JiraSession @JiraCredentials
 #  PERFORM REFRESH                                 #
 ####################################################
 
-Update-JiraSql @paramSplat -Verbose -ErrorAction "Stop"
+Update-JiraSql @paramSplat
 
 ####################################################
 #  CLOSE JIRA SESSION                              #
