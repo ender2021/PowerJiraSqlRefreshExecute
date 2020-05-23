@@ -1,6 +1,6 @@
 #import modules
-Import-Module PowerJira -Force
-Import-Module SqlServer -Force
+#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath \..\PowerJira\PowerJira\PowerJira.psm1) -Force
+#Import-Module (Join-Path -Path $PSScriptRoot -ChildPath \..\PowerJiraSqlRefresh\PowerJiraSqlRefresh\PowerJiraSqlRefresh.psm1) -Force
 Import-Module PowerJiraSqlRefresh -Force
 
 #import the variable $JiraCredentials
@@ -10,17 +10,32 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath \credentials\Credentials
 #  CONFIGURATION                                   #
 ####################################################
 
+$options = @{
+    ProjectCategories = $false
+    StatusCategories = $false
+    Statuses = $false
+    Resolutions = $false
+    Priorities = $false
+    IssueLinkTypes = $false
+    Users = $false
+    Projects = $false
+    Worklogs = $false
+    Issues = $true
+    Deployments = $false
+}
+
 #configure the database targets and refresh type
 $paramSplat = @{
     SqlInstance = "localhost"
     SqlDatabase = "Jira"
-    RefreshType = (Get-JiraRefreshTypes).Differential
+    RefreshType = (Get-JiraRefreshTypes).Full
+    SyncOptions = $options
 }
 
 #configuration of the projects to pull
-$getAll = $true
+$getAll = $false
 if(!$getAll) {
-    $paramSplat.Add("ProjectKeys", @("GROPGDIS","GDISPROJ","GDISTRAIN","GRPRIAREP","GRPRIAWEB","SFSDEVOPS","GFO","GSIS","GSPP","GSISPLAN"))
+    $paramSplat.Add("ProjectKeys", @("ARTKTEAM"))
 }
 
 ####################################################
@@ -33,7 +48,7 @@ Open-JiraSession @JiraCredentials
 #  PERFORM REFRESH                                 #
 ####################################################
 
-Update-JiraSql @paramSplat
+Update-JiraSql @paramSplat -Verbose
 
 ####################################################
 #  CLOSE JIRA SESSION                              #
